@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>連番PDFを結合</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="app__header">
+        <p class="app__kicker">PDF RANGE JOINER</p>
+        <h1>連番PDFを、<br>ひとつにまとめる。</h1>
+        <p class="app__lead">現行・旧形式の解説PDFを開いたまま、末尾の番号範囲を指定します。</p>
+      </header>
+
+      <section id="sourcePanel" class="source" aria-labelledby="sourceTitle">
+        <div class="source__heading">
+          <h2 id="sourceTitle">取得元</h2>
+          <button id="refreshButton" class="text-button" type="button">現在のタブを再取得</button>
+        </div>
+        <p id="sourceDirectory" class="source__path">現在のタブを確認中…</p>
+        <p id="sourceFile" class="source__file" aria-live="polite"></p>
+      </section>
+
+      <form id="mergeForm" novalidate>
+        <fieldset class="range-fields">
+          <legend>末尾の番号範囲</legend>
+          <label class="field">
+            <span class="field__label">開始番号</span>
+            <input id="startNumber" name="start" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" required>
+          </label>
+          <span class="range-separator" aria-hidden="true">—</span>
+          <label class="field">
+            <span class="field__label">終了番号</span>
+            <input id="endNumber" name="end" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" required>
+          </label>
+        </fieldset>
+        <p class="field-help">先頭のゼロは桁数で補います。例: 1〜91・4桁 → 0001.pdf〜0091.pdf</p>
+
+        <label class="auto-detect-toggle">
+          <input id="autoDetect" name="autoDetect" type="checkbox">
+          <span class="auto-detect-toggle__label">終了番号を自動検出</span>
+          <span class="auto-detect-toggle__hint">1から順に取得し、見つからなくなった時点で自動停止</span>
+        </label>
+
+        <div class="detail-grid">
+          <label class="field">
+            <span class="field__label">ゼロ埋め桁数</span>
+            <input id="digits" name="digits" type="number" min="1" max="12" step="1" required>
+          </label>
+          <label class="field">
+            <span class="field__label">欠番があった場合</span>
+            <select id="missingPolicy" name="missingPolicy">
+              <option value="stop">その時点で停止</option>
+              <option value="skip">飛ばして続行</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="field field--wide">
+          <span class="field__label">保存ファイル名</span>
+          <input id="filename" name="filename" type="text" value="merged-pages.pdf" autocomplete="off" required>
+        </label>
+
+        <div id="validationMessage" class="message message--error" role="alert" hidden></div>
+        <div id="runtimeNotice" class="message message--notice" role="status" hidden></div>
+
+        <div class="actions">
+          <button id="mergeButton" class="primary-button" type="submit" disabled>
+            <span class="primary-button__idle">PDFを結合して保存</span>
+            <span class="primary-button__busy" hidden>取得しています…</span>
+          </button>
+          <button id="cancelButton" class="secondary-button" type="button" hidden>キャンセル</button>
+          <button id="manualSaveButton" class="primary-button" type="button" hidden>PDFを保存</button>
+        </div>
+      </form>
+
+      <section id="progressPanel" class="progress-panel" aria-labelledby="progressTitle" hidden>
+        <div class="progress-panel__heading">
+          <h2 id="progressTitle">処理状況</h2>
+          <span id="progressCount" class="progress-panel__count">0 / 0</span>
+        </div>
+        <progress id="progressBar" value="0" max="1"></progress>
+        <p id="statusMessage" class="status" aria-live="polite"></p>
+        <details id="failureDetails" hidden>
+          <summary>取得できなかったページ</summary>
+          <ul id="failureList"></ul>
+        </details>
+      </section>
+
+      <footer class="notice">
+        <p>通常閲覧できるPDFだけを対象に、最大300ページを順番に取得します。短い範囲で利用し、サイトへの負荷と著作権に配慮してください。</p>
+      </footer>
+    </main>
+
+  <script src="lib/pdf-lib.min.js"></script>
+    <script src="core.js"></script>
+  <script src="offscreen.js"></script>
+    <script src="popup-controller.js"></script>
+  </body>
+</html>

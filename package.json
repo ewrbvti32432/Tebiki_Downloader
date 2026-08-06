@@ -1,0 +1,14 @@
+{
+  "name": "kawaiportal-pdf-joiner",
+  "version": "1.4.2",
+  "private": true,
+  "description": "連番の単ページPDFを結合するChrome拡張機能",
+  "license": "GPL-3.0-or-later",
+  "author": "tqmane",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "pdf-lib": "1.17.1"
+  }
+}
